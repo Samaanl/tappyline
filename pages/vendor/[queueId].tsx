@@ -528,10 +528,15 @@ export default function VendorDashboard() {
                           </p>
                           {customer.customerPhone && (
                             <p className="text-sm text-gray-600">
-                              {customer.customerPhone}
+                              📞 {customer.customerPhone}
                             </p>
                           )}
-                          <p className="text-xs text-gray-500">
+                          {customer.customerMessage && (
+                            <p className="text-sm text-gray-700 mt-1 bg-blue-50 px-2 py-1 rounded border border-blue-200 inline-block">
+                              💬 {customer.customerMessage}
+                            </p>
+                          )}
+                          <p className="text-xs text-gray-500 mt-1">
                             Joined{" "}
                             {new Date(customer.joinedAt).toLocaleTimeString()}
                           </p>

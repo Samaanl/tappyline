@@ -37,6 +37,7 @@ export interface Customer {
   queueId: string;
   customerName: string;
   customerPhone?: string;
+  customerMessage?: string;
   position: number;
   status: "waiting" | "next" | "served" | "left";
   joinedAt: string;
@@ -118,7 +119,8 @@ export const customerOperations = {
   async addCustomer(
     queueId: string,
     customerName: string,
-    customerPhone?: string
+    customerPhone?: string,
+    customerMessage?: string
   ): Promise<Customer> {
     // Get current queue size
     const existingCustomers = await this.getQueueCustomers(queueId);
@@ -128,6 +130,7 @@ export const customerOperations = {
       queueId,
       customerName,
       customerPhone,
+      customerMessage,
       position,
       status: "waiting",
       joinedAt: new Date().toISOString(),

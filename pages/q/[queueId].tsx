@@ -16,6 +16,7 @@ export default function CustomerQueue() {
   const [myCustomer, setMyCustomer] = useState<Customer | null>(null);
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
+  const [customerMessage, setCustomerMessage] = useState("");
   const [queueSize, setQueueSize] = useState(0);
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
@@ -146,7 +147,8 @@ export default function CustomerQueue() {
       const customer = await customerOperations.addCustomer(
         queueId,
         customerName,
-        customerPhone || undefined
+        customerPhone || undefined,
+        customerMessage || undefined
       );
 
       setMyCustomer(customer);
@@ -287,6 +289,28 @@ export default function CustomerQueue() {
                   />
                   <p className="text-xs text-gray-500 mt-1">
                     Optional: Get SMS updates when it's your turn
+                  </p>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="customerMessage"
+                    className="block text-sm font-semibold text-gray-700 mb-2"
+                  >
+                    Message to Vendor (optional)
+                  </label>
+                  <textarea
+                    id="customerMessage"
+                    className="input resize-none"
+                    placeholder="E.g., 'I want to order 2 pizzas' or 'Looking for a haircut'"
+                    value={customerMessage}
+                    onChange={(e) => setCustomerMessage(e.target.value)}
+                    disabled={joining}
+                    rows={3}
+                    maxLength={200}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Tell the vendor what you need (max 200 characters)
                   </p>
                 </div>
 
