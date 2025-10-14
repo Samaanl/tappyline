@@ -14,11 +14,11 @@ if (process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID) {
 export const databases = new Databases(client);
 
 // Database and Collection IDs with fallbacks
-export const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || '';
+export const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || "";
 export const QUEUES_COLLECTION_ID =
-  process.env.NEXT_PUBLIC_APPWRITE_QUEUES_COLLECTION_ID || '';
+  process.env.NEXT_PUBLIC_APPWRITE_QUEUES_COLLECTION_ID || "";
 export const CUSTOMERS_COLLECTION_ID =
-  process.env.NEXT_PUBLIC_APPWRITE_CUSTOMERS_COLLECTION_ID || '';
+  process.env.NEXT_PUBLIC_APPWRITE_CUSTOMERS_COLLECTION_ID || "";
 
 // Types
 export interface Queue {

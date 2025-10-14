@@ -21,7 +21,9 @@ export default function Home() {
     e.preventDefault();
 
     if (!isConfigured) {
-      toast.error("Appwrite is not configured. Please check your environment variables.");
+      toast.error(
+        "Appwrite is not configured. Please check your environment variables."
+      );
       return;
     }
 
@@ -130,7 +132,8 @@ export default function Home() {
                       🔧 Configuration Required
                     </h4>
                     <p className="text-sm text-red-800 mb-3">
-                      Appwrite environment variables are not configured. Please add these variables to your environment:
+                      Appwrite environment variables are not configured. Please
+                      add these variables to your environment:
                     </p>
                     <ul className="text-xs text-red-700 space-y-1 font-mono bg-red-100 p-3 rounded">
                       <li>• NEXT_PUBLIC_APPWRITE_ENDPOINT</li>
@@ -141,7 +144,11 @@ export default function Home() {
                       <li>• NEXT_PUBLIC_APP_URL</li>
                     </ul>
                     <p className="text-xs text-red-700 mt-3">
-                      See <code className="bg-red-200 px-1 py-0.5 rounded">APPWRITE_SETUP.md</code> for setup instructions.
+                      See{" "}
+                      <code className="bg-red-200 px-1 py-0.5 rounded">
+                        APPWRITE_SETUP.md
+                      </code>{" "}
+                      for setup instructions.
                     </p>
                   </div>
                 </div>
