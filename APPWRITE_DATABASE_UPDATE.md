@@ -3,6 +3,7 @@
 ## What Changed?
 
 We added a **customer message** feature that allows customers to send notes to vendors when joining the queue. For example:
+
 - "I want to order 2 pizzas"
 - "Looking for a haircut"
 - "Need a table for 4"
@@ -38,13 +39,13 @@ Select: **String**
 
 #### Configuration:
 
-| Field | Value |
-|-------|-------|
-| **Attribute Key** | `customerMessage` |
-| **Size** | `200` |
-| **Required** | **No** (uncheck this - it's optional) |
-| **Array** | **No** (uncheck this) |
-| **Default Value** | Leave empty |
+| Field             | Value                                 |
+| ----------------- | ------------------------------------- |
+| **Attribute Key** | `customerMessage`                     |
+| **Size**          | `200`                                 |
+| **Required**      | **No** (uncheck this - it's optional) |
+| **Array**         | **No** (uncheck this)                 |
+| **Default Value** | Leave empty                           |
 
 #### Click "Create"
 
@@ -65,6 +66,7 @@ After adding the attribute:
 ## 📸 Visual Guide
 
 ### Before (Old Schema):
+
 ```
 customers collection:
 - queueId (string, required)
@@ -77,6 +79,7 @@ customers collection:
 ```
 
 ### After (New Schema):
+
 ```
 customers collection:
 - queueId (string, required)
@@ -94,12 +97,14 @@ customers collection:
 ## 🚀 What This Enables
 
 ### For Customers:
+
 - Can send a message when joining the queue
 - Tell vendor what they need
 - Provide order details or preferences
 - Optional field (200 character limit)
 
 ### For Vendors:
+
 - See customer messages on the dashboard
 - Prepare orders in advance
 - Better understand customer needs
@@ -110,21 +115,25 @@ customers collection:
 ## 🎯 Example Messages Customers Can Send
 
 **Restaurant:**
+
 - "2 pepperoni pizzas, large"
 - "Table for 4, anniversary dinner"
 - "Picking up takeout order #456"
 
 **Salon:**
+
 - "Haircut and beard trim"
 - "Need coloring, have 2 hours"
 - "Just a quick trim, no wash"
 
 **Pop-up Shop:**
+
 - "Looking for size M t-shirts"
 - "Interested in the blue backpack"
 - "Just browsing, no rush"
 
 **Event:**
+
 - "Registering for workshop #3"
 - "VIP ticket pickup - John Smith"
 - "Question about pricing"
@@ -134,15 +143,18 @@ customers collection:
 ## 🔍 Troubleshooting
 
 ### "Attribute already exists" error?
+
 - The attribute might already be created. Check the attributes list.
 - If it exists with wrong settings, delete it and recreate with correct settings.
 
 ### Messages not showing on vendor dashboard?
+
 - Make sure you've deployed the latest code to Vercel
 - Clear your browser cache
 - Check that the attribute is named exactly `customerMessage` (case-sensitive!)
 
 ### Can't create attribute?
+
 - Make sure you have the correct permissions in Appwrite
 - Make sure the collection isn't locked or in use
 - Wait a few seconds and try again

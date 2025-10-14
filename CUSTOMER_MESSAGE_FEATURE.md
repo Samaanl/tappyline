@@ -3,6 +3,7 @@
 ## What's New?
 
 Customers can now send messages to vendors when joining the queue! This allows them to:
+
 - Specify what they want to order/buy
 - Provide special requests or preferences
 - Share order numbers or details
@@ -15,6 +16,7 @@ Customers can now send messages to vendors when joining the queue! This allows t
 ### Customer Side (Join Queue Form)
 
 **BEFORE:**
+
 ```
 ┌─────────────────────────────────┐
 │  Join the Queue                 │
@@ -30,6 +32,7 @@ Customers can now send messages to vendors when joining the queue! This allows t
 ```
 
 **AFTER:**
+
 ```
 ┌─────────────────────────────────┐
 │  Join the Queue                 │
@@ -55,6 +58,7 @@ Customers can now send messages to vendors when joining the queue! This allows t
 ### Vendor Side (Dashboard)
 
 **BEFORE:**
+
 ```
 ┌─────────────────────────────────────────┐
 │ #1  John Doe                    [Remove]│
@@ -64,6 +68,7 @@ Customers can now send messages to vendors when joining the queue! This allows t
 ```
 
 **AFTER:**
+
 ```
 ┌─────────────────────────────────────────┐
 │ #1  John Doe                    [Remove]│
@@ -80,13 +85,14 @@ The message appears in a **blue bubble** between the phone number and join time!
 ## 📝 Code Changes Summary
 
 ### 1. TypeScript Interface (`lib/appwrite.ts`)
+
 ```typescript
 export interface Customer {
   $id?: string;
   queueId: string;
   customerName: string;
   customerPhone?: string;
-  customerMessage?: string;  // ← NEW FIELD
+  customerMessage?: string; // ← NEW FIELD
   position: number;
   status: "waiting" | "next" | "served" | "left";
   joinedAt: string;
@@ -95,6 +101,7 @@ export interface Customer {
 ```
 
 ### 2. Add Customer Function (`lib/appwrite.ts`)
+
 ```typescript
 async addCustomer(
   queueId: string,
@@ -105,11 +112,13 @@ async addCustomer(
 ```
 
 ### 3. Customer Queue Page (`pages/q/[queueId].tsx`)
+
 - Added `customerMessage` state variable
 - Added textarea input field (200 char limit, 3 rows)
 - Passed message to `addCustomer()` function
 
 ### 4. Vendor Dashboard (`pages/vendor/[queueId].tsx`)
+
 - Display customer message in blue bubble
 - Shows icon 💬 before message
 - Only displays if customer provided a message
@@ -121,6 +130,7 @@ async addCustomer(
 ### Appwrite Collection: `customers`
 
 **New Attribute:**
+
 - **Key:** `customerMessage`
 - **Type:** String
 - **Size:** 200 characters
@@ -132,6 +142,7 @@ async addCustomer(
 ## 🔄 User Flow
 
 ### Customer Journey:
+
 1. Scan QR code → Opens queue page
 2. Enter name (required)
 3. Enter phone (optional)
@@ -140,6 +151,7 @@ async addCustomer(
 6. Message is saved and visible to vendor
 
 ### Vendor Journey:
+
 1. Customer joins queue
 2. Vendor sees customer appear in real-time
 3. **Vendor sees customer's message** ← NEW!
@@ -151,6 +163,7 @@ async addCustomer(
 ## 📊 Real-World Examples
 
 ### Restaurant Use Case
+
 ```
 Customer: "Sarah"
 Phone: "+1234567890"
@@ -160,6 +173,7 @@ Message: "2 pepperoni pizzas, large, extra cheese"
 ```
 
 ### Salon Use Case
+
 ```
 Customer: "Mike"
 Phone: "+1234567890"
@@ -169,6 +183,7 @@ Message: "Just a quick trim, no wash needed"
 ```
 
 ### Pop-up Shop Use Case
+
 ```
 Customer: "Emma"
 Phone: ""
@@ -178,6 +193,7 @@ Message: "Looking for the blue backpack from your Instagram"
 ```
 
 ### Event Registration Use Case
+
 ```
 Customer: "John Smith"
 Phone: "+1234567890"
@@ -191,12 +207,14 @@ Message: "VIP ticket pickup, confirmation #ABC123"
 ## ✅ Benefits
 
 ### For Customers:
+
 - ✅ Clear communication with vendor
 - ✅ Can specify exactly what they need
 - ✅ Reduces back-and-forth when served
 - ✅ Optional - no pressure to write anything
 
 ### For Vendors:
+
 - ✅ Better preparation for each customer
 - ✅ Can prioritize or group similar requests
 - ✅ Improved service speed
@@ -222,6 +240,7 @@ Message: "VIP ticket pickup, confirmation #ABC123"
 ## 🔍 Technical Details
 
 ### Field Specifications:
+
 - **Maximum Length:** 200 characters
 - **Field Type:** Multi-line textarea
 - **Rows:** 3 (visual height)
@@ -229,6 +248,7 @@ Message: "VIP ticket pickup, confirmation #ABC123"
 - **Validation:** None (optional field, any text allowed)
 
 ### Display Specifications:
+
 - **Location:** Between phone number and join time
 - **Styling:** Blue background (`bg-blue-50`), blue border (`border-blue-200`)
 - **Icon:** 💬 (speech bubble emoji)
@@ -248,10 +268,12 @@ Message: "VIP ticket pickup, confirmation #ABC123"
 ## 🎯 Next Steps
 
 1. **Update Appwrite Database:**
+
    - Follow instructions in `APPWRITE_DATABASE_UPDATE.md`
    - Add `customerMessage` attribute to `customers` collection
 
 2. **Deploy to Production:**
+
    - Code is already pushed to GitHub
    - Vercel will auto-deploy
    - Or manually trigger deployment

@@ -912,7 +912,7 @@ export default function Home() {
                 <p className="text-gray-700">
                   Yes, it's completely free! No trial periods, no premium plans,
                   no "limited features" for free users. We built TappyLine to
-                  make queue management accessible to everyone - from small food
+                  make queue management accessible to everyone, from small food
                   trucks to large restaurants. Create unlimited queues, serve
                   unlimited customers, completely free forever.
                 </p>
@@ -969,7 +969,7 @@ export default function Home() {
                   TappyLine requires an internet connection to work because it
                   uses real-time synchronization to keep everyone updated. Both
                   you (the vendor) and your customers need to be online.
-                  However, the data usage is minimal - just small updates
+                  However, the data usage is minimal, just small updates
                   whenever someone joins or is served.
                 </p>
               </div>
