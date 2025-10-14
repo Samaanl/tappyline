@@ -1,18 +1,24 @@
 import { Client, Databases, ID, Query } from "appwrite";
 
-// Appwrite client configuration
-const client = new Client()
-  .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
-  .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!);
+// Appwrite client configuration with fallbacks for build time
+const client = new Client();
+
+// Only set endpoint and project if environment variables are available
+if (process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT) {
+  client.setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT);
+}
+if (process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID) {
+  client.setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID);
+}
 
 export const databases = new Databases(client);
 
-// Database and Collection IDs
-export const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!;
+// Database and Collection IDs with fallbacks
+export const DATABASE_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || '';
 export const QUEUES_COLLECTION_ID =
-  process.env.NEXT_PUBLIC_APPWRITE_QUEUES_COLLECTION_ID!;
+  process.env.NEXT_PUBLIC_APPWRITE_QUEUES_COLLECTION_ID || '';
 export const CUSTOMERS_COLLECTION_ID =
-  process.env.NEXT_PUBLIC_APPWRITE_CUSTOMERS_COLLECTION_ID!;
+  process.env.NEXT_PUBLIC_APPWRITE_CUSTOMERS_COLLECTION_ID || '';
 
 // Types
 export interface Queue {
@@ -235,6 +241,16 @@ export const customerOperations = {
 };
 
 // Helper Functions
+export function isAppwriteConfigured(): boolean {
+  return !!(
+    process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT &&
+    process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID &&
+    process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID &&
+    process.env.NEXT_PUBLIC_APPWRITE_QUEUES_COLLECTION_ID &&
+    process.env.NEXT_PUBLIC_APPWRITE_CUSTOMERS_COLLECTION_ID
+  );
+}
+
 function generateQueueId(businessName: string): string {
   const cleaned = businessName
     .toLowerCase()
