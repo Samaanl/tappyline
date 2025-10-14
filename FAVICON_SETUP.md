@@ -74,6 +74,7 @@ If you want to create favicons manually:
 ### Convert PNG to ICO:
 
 Use an online converter like:
+
 - https://convertico.com/
 - https://www.icoconverter.com/
 
@@ -86,9 +87,11 @@ Upload your 512x512 PNG and export as `favicon.ico`
 If you just want something working NOW, here's a 1-minute solution:
 
 ### Step 1: Go to Favicon Generator
+
 Visit: https://favicon.io/favicon-generator/
 
 ### Step 2: Configure
+
 ```
 Text: T
 Background: Rounded
@@ -99,16 +102,20 @@ Font Color: #ffffff
 ```
 
 ### Step 3: Download
+
 Click "Download" and you'll get a ZIP file.
 
 ### Step 4: Extract Files
+
 Extract and copy these files to your `public/` folder:
+
 - `favicon.ico`
 - `apple-touch-icon.png`
 - `android-chrome-192x192.png` (rename to `icon-192.png`)
 - `android-chrome-512x512.png` (rename to `icon-512.png`)
 
 ### Step 5: Done!
+
 That's it! Your favicon is ready.
 
 ---
@@ -150,6 +157,7 @@ public/
 ### Favicon Checker:
 
 Test your favicon across all platforms:
+
 - https://realfavicongenerator.net/favicon_checker
 
 ---
@@ -157,14 +165,17 @@ Test your favicon across all platforms:
 ## 🎯 Favicon Specifications
 
 ### Desktop Browsers:
+
 - **Chrome/Edge/Firefox:** Uses `favicon.svg` or `favicon.ico`
 - **Safari:** Prefers `favicon.svg`
 
 ### Mobile Browsers:
+
 - **iOS Safari:** Uses `apple-touch-icon.png` (180x180)
 - **Android Chrome:** Uses icons from `site.webmanifest` (192x192, 512x512)
 
 ### PWA (Add to Home Screen):
+
 - **iOS:** Uses `apple-touch-icon.png`
 - **Android:** Uses `icon-192.png` and `icon-512.png`
 
@@ -173,12 +184,14 @@ Test your favicon across all platforms:
 ## 🎨 Design Tips
 
 Your current SVG favicon is great! It has:
+
 - ✅ Orange gradient background (#f97316 to #f59e0b)
 - ✅ White "T" letter
 - ✅ Rounded corners
 - ✅ Clean, minimal design
 
 **Tips for best results:**
+
 - Keep it simple (works at 16x16px)
 - Use high contrast (white on orange is perfect!)
 - Avoid fine details
@@ -199,6 +212,7 @@ Your current SVG favicon is great! It has:
 ### Different favicon on different devices?
 
 This is normal! Different platforms use different favicon files:
+
 - Desktop: `favicon.ico` or `favicon.svg`
 - iOS: `apple-touch-icon.png`
 - Android: `icon-192.png`, `icon-512.png`
@@ -206,6 +220,7 @@ This is normal! Different platforms use different favicon files:
 ### Favicon showing old version?
 
 Clear browser favicon cache:
+
 1. Close all tabs
 2. Clear browsing data (select "Cached images and files")
 3. Restart browser
@@ -216,6 +231,7 @@ Clear browser favicon cache:
 ## 📱 PWA Bonus: Add to Home Screen
 
 With the web manifest file, users can now:
+
 - **iOS:** Add TappyLine to home screen (shows custom icon)
 - **Android:** Install as PWA (shows custom icon and splash screen)
 - **Desktop:** Install as app (Chrome, Edge)
@@ -245,12 +261,14 @@ After generating and adding favicon files:
 ## 🚀 Quick Commands
 
 ### Build and Test:
+
 ```bash
 npm run dev
 # Open http://localhost:3000 and check browser tab
 ```
 
 ### Deploy:
+
 ```bash
 git add public/
 git commit -m "Add favicon files"
