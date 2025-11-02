@@ -12,6 +12,8 @@ export default function Home() {
   const [contactPhone, setContactPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [isConfigured, setIsConfigured] = useState(true);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [createdQueueId, setCreatedQueueId] = useState("");
 
   useEffect(() => {
     // Check if Appwrite is configured
@@ -48,18 +50,32 @@ export default function Home() {
         localStorage.setItem(`vendor_auth_${queue.queueId}`, password);
       }
 
-      toast.success("Queue created! Redirecting...");
+      toast.success("Queue created successfully!");
 
-      // Navigate to vendor dashboard
-      setTimeout(() => {
-        router.push(`/vendor/${queue.queueId}`);
-      }, 1000);
+      // Store the created queue ID and show modal
+      setCreatedQueueId(queue.queueId);
+      setShowSuccessModal(true);
     } catch (error) {
       console.error("Error creating queue:", error);
       toast.error("Failed to create queue. Please try again.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCopyLink = () => {
+    const vendorLink = `${window.location.origin}/vendor/${createdQueueId}`;
+    navigator.clipboard.writeText(vendorLink);
+    toast.success("Link copied to clipboard!");
+  };
+
+  const handleGoToDashboard = () => {
+    setShowSuccessModal(false);
+    router.push(`/vendor/${createdQueueId}`);
+  };
+
+  const getVendorDashboardLink = () => {
+    return `${window.location.origin}/vendor/${createdQueueId}`;
   };
 
   return (
@@ -97,6 +113,263 @@ export default function Home() {
         />
         <link rel="canonical" href="https://tappyline.com" />
       </Head>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="p-6 md:p-8">
+              {/* Header */}
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg
+                    className="w-8 h-8 text-green-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                  🎉 Queue Created Successfully!
+                </h2>
+                <p className="text-gray-600">
+                  Save this link to access your dashboard anytime
+                </p>
+              </div>
+
+              {/* Link Display */}
+              <div className="mb-6">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Your Vendor Dashboard Link:
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={getVendorDashboardLink()}
+                    readOnly
+                    className="flex-1 px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-sm font-mono text-gray-800 focus:outline-none"
+                  />
+                  <button
+                    onClick={handleCopyLink}
+                    className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl transition-all duration-200 flex items-center gap-2 whitespace-nowrap"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                      />
+                    </svg>
+                    Copy
+                  </button>
+                </div>
+              </div>
+
+              {/* Important Instructions */}
+              <div className="space-y-4 mb-6">
+                {/* Bookmark Warning */}
+                <div className="bg-red-50 border-2 border-red-300 rounded-xl p-4">
+                  <div className="flex items-start gap-3">
+                    <svg
+                      className="w-6 h-6 text-red-600 mt-0.5 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                      />
+                    </svg>
+                    <div>
+                      <h4 className="font-bold text-red-900 mb-1">
+                        ⚠️ IMPORTANT: Save This Link!
+                      </h4>
+                      <p className="text-sm text-red-800">
+                        <strong>Bookmark this page right now!</strong> If you
+                        close this tab and lose the link, you won't be able to
+                        access your queue dashboard. There's no way to recover
+                        it without the exact link.
+                      </p>
+                      <p className="text-sm text-red-800 mt-2">
+                        💡 <strong>Recommended:</strong> Copy the link and paste
+                        it in your browser's address bar to bookmark it, or save
+                        it in your notes/email.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Authentication Info */}
+                {contactEmail || contactPhone ? (
+                  <div className="bg-green-50 border-2 border-green-300 rounded-xl p-4">
+                    <div className="flex items-start gap-3">
+                      <svg
+                        className="w-6 h-6 text-green-600 mt-0.5 flex-shrink-0"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                        />
+                      </svg>
+                      <div>
+                        <h4 className="font-bold text-green-900 mb-1">
+                          🔒 Dashboard Protected
+                        </h4>
+                        <p className="text-sm text-green-800 mb-2">
+                          Your dashboard is password-protected with your{" "}
+                          <strong>
+                            {contactEmail ? "email" : "phone number"}
+                          </strong>
+                          :
+                        </p>
+                        <div className="bg-green-100 px-3 py-2 rounded-lg font-mono text-sm text-green-900 inline-block">
+                          {contactEmail || contactPhone}
+                        </div>
+                        <p className="text-sm text-green-800 mt-2">
+                          ✅ When you revisit the link, enter this{" "}
+                          {contactEmail ? "email" : "phone number"} to
+                          authenticate and access your queue dashboard.
+                        </p>
+                        <p className="text-sm text-green-800 mt-2">
+                          ✅ This prevents unauthorized users from managing your
+                          queue.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-4">
+                    <div className="flex items-start gap-3">
+                      <svg
+                        className="w-6 h-6 text-amber-600 mt-0.5 flex-shrink-0"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                        />
+                      </svg>
+                      <div>
+                        <h4 className="font-bold text-amber-900 mb-1">
+                          ⚠️ No Password Protection
+                        </h4>
+                        <p className="text-sm text-amber-800 mb-2">
+                          You didn't set an email or phone number, so{" "}
+                          <strong>
+                            anyone with this link can manage your queue
+                          </strong>
+                          .
+                        </p>
+                        <p className="text-sm text-amber-800 mb-2">
+                          🔐 <strong>Recommendation:</strong> If you want to
+                          protect your dashboard, you can create a fresh queue
+                          and set an email or phone as the password. This is
+                          highly recommended for security.
+                        </p>
+                        <p className="text-sm text-amber-800">
+                          💡 Otherwise, keep this link private and don't share
+                          it publicly!
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Quick Tips */}
+                <div className="bg-blue-50 border-2 border-blue-300 rounded-xl p-4">
+                  <div className="flex items-start gap-3">
+                    <svg
+                      className="w-6 h-6 text-blue-600 mt-0.5 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    <div>
+                      <h4 className="font-bold text-blue-900 mb-2">
+                        💡 Quick Tips
+                      </h4>
+                      <ul className="text-sm text-blue-800 space-y-1">
+                        <li>
+                          📱 <strong>Access Anytime:</strong> Paste this link in
+                          your browser to get back to your queue dashboard, even
+                          if you close the tab or browser
+                        </li>
+                        <li>
+                          🔖 <strong>Bookmark It:</strong> Press Ctrl+D
+                          (Windows) or Cmd+D (Mac) on your dashboard to bookmark
+                          it
+                        </li>
+                        <li>
+                          📧 <strong>Email Yourself:</strong> Send the link to
+                          your email for safe keeping
+                        </li>
+                        <li>
+                          📝 <strong>Write It Down:</strong> Save the link in
+                          your notes app or document
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={handleGoToDashboard}
+                  className="flex-1 btn-primary"
+                >
+                  Go to Dashboard →
+                </button>
+                <button
+                  onClick={handleCopyLink}
+                  className="flex-1 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-xl transition-all duration-200"
+                >
+                  Copy Link Again
+                </button>
+              </div>
+
+              {/* Footer Note */}
+              <p className="text-xs text-gray-500 text-center mt-4">
+                Once you're ready, click "Go to Dashboard" to start managing
+                your queue
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Header */}
       <header className="container mx-auto px-4 py-6">
