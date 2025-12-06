@@ -19,6 +19,10 @@ export default function CustomerQueue() {
   const [customerMessage, setCustomerMessage] = useState("");
   const [queueSize, setQueueSize] = useState(0);
   const [timeLeft, setTimeLeft] = useState(60);
+  const [peopleAhead, setPeopleAhead] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [joining, setJoining] = useState(false);
+  const unsubscribeRef = useRef<(() => void) | null>(null);
 
   // ... existing useEffects ...
 
