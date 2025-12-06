@@ -144,11 +144,12 @@ export default function CustomerQueue() {
   };
 
   const checkCustomerStatus = async () => {
-    if (!myCustomer?.$id || typeof queueId !== "string") return;
+    const currentCustomer = myCustomerRef.current;
+    if (!currentCustomer?.$id || typeof queueId !== "string") return;
 
     try {
       // 1. Fetch my specific document to check true status
-      const me = await customerOperations.getCustomer(myCustomer.$id);
+      const me = await customerOperations.getCustomer(currentCustomer.$id);
 
       if (!me) {
         toast.error("You were removed from the queue");
@@ -166,14 +167,14 @@ export default function CustomerQueue() {
       }
 
       if (me.status === "served") {
-        if (myCustomer.status !== "served") {
+        if (currentCustomer.status !== "served") {
           toast.success("It's your turn! Please proceed! 🎊");
         }
         return;
       }
 
       if (me.status === "next") {
-        if (myCustomer.status !== "next") {
+        if (currentCustomer.status !== "next") {
           toast("You're next! Get ready! 🎉", {
             icon: "👋",
             duration: 6000,
