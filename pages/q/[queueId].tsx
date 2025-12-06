@@ -18,6 +18,7 @@ export default function CustomerQueue() {
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerMessage, setCustomerMessage] = useState("");
   const [queueSize, setQueueSize] = useState(0);
+  const [peopleAhead, setPeopleAhead] = useState(0);
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
   const unsubscribeRef = useRef<(() => void) | null>(null);
@@ -103,10 +104,12 @@ export default function CustomerQueue() {
 
     try {
       const customers = await customerOperations.getQueueCustomers(queueId);
-      const found = customers.find((c) => c.$id === myCustomer.$id);
+      const index = customers.findIndex((c) => c.$id === myCustomer.$id);
+      const found = customers[index];
 
       if (found) {
         setMyCustomer(found);
+        setPeopleAhead(index); // Index 0 means 0 people ahead
         localStorage.setItem(`customer_${queueId}`, JSON.stringify(found));
 
         // Show notification if customer is next
@@ -155,6 +158,10 @@ export default function CustomerQueue() {
       localStorage.setItem(`customer_${queueId}`, JSON.stringify(customer));
       toast.success("You've joined the queue!");
 
+      // Calculate initial people ahead
+      // Since we just joined, we are at the end.
+      // But let's fetch to be sure and get the count.
+      await checkCustomerStatus();
       await loadQueueSize();
     } catch (error) {
       console.error("Error joining queue:", error);
@@ -165,6 +172,10 @@ export default function CustomerQueue() {
   };
 
   const handleLeaveQueue = async () => {
+    if (!confirm("Are you sure you want to leave the queue? You will lose your spot.")) {
+      return;
+    }
+
     if (!myCustomer?.$id) {
       setMyCustomer(null);
       if (typeof queueId === "string") {
@@ -244,9 +255,8 @@ export default function CustomerQueue() {
                 <p className="text-gray-600">
                   {queueSize === 0
                     ? "Be the first in line!"
-                    : `${queueSize} ${
-                        queueSize === 1 ? "person" : "people"
-                      } currently waiting`}
+                    : `${queueSize} ${queueSize === 1 ? "person" : "people"
+                    } currently waiting`}
                 </p>
               </div>
 
@@ -328,23 +338,24 @@ export default function CustomerQueue() {
             <div className="space-y-6">
               <div className="card text-center">
                 <div className="mb-6">
+                  <div className="text-sm font-semibold text-gray-500 mb-2 uppercase tracking-wide">
+                    Ticket Number
+                  </div>
                   <div
-                    className={`inline-block w-24 h-24 rounded-full flex items-center justify-center mb-4 ${
-                      myCustomer.status === "next"
-                        ? "bg-orange-100 animate-pulse"
-                        : myCustomer.status === "served"
+                    className={`inline-block w-24 h-24 rounded-full flex items-center justify-center mb-4 ${myCustomer.status === "next"
+                      ? "bg-orange-100 animate-pulse"
+                      : myCustomer.status === "served"
                         ? "bg-green-100"
                         : "bg-gray-100"
-                    }`}
+                      }`}
                   >
                     <span
-                      className={`text-4xl font-black ${
-                        myCustomer.status === "next"
-                          ? "text-orange-600"
-                          : myCustomer.status === "served"
+                      className={`text-4xl font-black ${myCustomer.status === "next"
+                        ? "text-orange-600"
+                        : myCustomer.status === "served"
                           ? "text-green-600"
                           : "text-gray-700"
-                      }`}
+                        }`}
                     >
                       #{myCustomer.position}
                     </span>
@@ -374,13 +385,10 @@ export default function CustomerQueue() {
                         You're in Line
                       </h2>
                       <p className="text-gray-600">
-                        {myCustomer.position === 1
-                          ? "You're first!"
-                          : `${myCustomer.position - 1} ${
-                              myCustomer.position - 1 === 1
-                                ? "person"
-                                : "people"
-                            } ahead of you`}
+                        {peopleAhead === 0
+                          ? "You're next in line!"
+                          : `${peopleAhead} ${peopleAhead === 1 ? "person" : "people"
+                          } ahead of you`}
                       </p>
                     </>
                   )}

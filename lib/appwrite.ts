@@ -122,9 +122,21 @@ export const customerOperations = {
     customerPhone?: string,
     customerMessage?: string
   ): Promise<Customer> {
-    // Get current queue size
-    const existingCustomers = await this.getQueueCustomers(queueId);
-    const position = existingCustomers.length + 1;
+    // Get the last customer to determine the next position number
+    const lastCustomer = await databases.listDocuments(
+      DATABASE_ID,
+      CUSTOMERS_COLLECTION_ID,
+      [
+        Query.equal("queueId", queueId),
+        Query.orderDesc("position"),
+        Query.limit(1),
+      ]
+    );
+
+    const position =
+      lastCustomer.documents.length > 0
+        ? (lastCustomer.documents[0] as unknown as Customer).position + 1
+        : 1;
 
     const customer: Omit<Customer, "$id"> = {
       queueId,
@@ -181,21 +193,6 @@ export const customerOperations = {
     return response as unknown as Customer;
   },
 
-  // Reorder positions after a customer is removed or served
-  async reorderPositions(queueId: string): Promise<void> {
-    const customers = await this.getQueueCustomers(queueId);
-
-    // Update positions to be sequential (1, 2, 3, ...)
-    const updates = customers.map((customer, index) =>
-      this.updateCustomer(customer.$id!, {
-        position: index + 1,
-        status: index === 0 ? "next" : "waiting",
-      })
-    );
-
-    await Promise.all(updates);
-  },
-
   // Remove customer from queue
   async removeCustomer(documentId: string, queueId: string): Promise<void> {
     // Mark as left
@@ -205,9 +202,6 @@ export const customerOperations = {
       documentId,
       { status: "left" } as any
     );
-
-    // Reorder remaining customers
-    await this.reorderPositions(queueId);
   },
 
   // Serve next customer
@@ -223,8 +217,13 @@ export const customerOperations = {
       notifiedAt: new Date().toISOString(),
     });
 
-    // Reorder remaining customers and mark first as "next"
-    await this.reorderPositions(queueId);
+    // If there is a next customer, mark them as "next"
+    if (customers.length > 1) {
+      const newNext = customers[1];
+      await this.updateCustomer(newNext.$id!, {
+        status: "next",
+      });
+    }
 
     return nextCustomer;
   },

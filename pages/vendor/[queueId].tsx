@@ -228,10 +228,12 @@ export default function VendorDashboard() {
     if (typeof queueId !== "string") return;
 
     try {
-      // Remove one by one to trigger reordering properly
-      for (const customer of customers) {
-        await customerOperations.removeCustomer(customer.$id!, queueId);
-      }
+      // Remove all in parallel
+      await Promise.all(
+        customers.map((customer) =>
+          customerOperations.removeCustomer(customer.$id!, queueId)
+        )
+      );
       toast.success("Queue cleared");
       // Don't need to loadCustomers - realtime will update
     } catch (error) {
@@ -507,17 +509,15 @@ export default function VendorDashboard() {
                   {customers.map((customer, index) => (
                     <div
                       key={customer.$id}
-                      className={`p-4 rounded-xl border-2 flex items-center justify-between transition-all ${
-                        index === 0
+                      className={`p-4 rounded-xl border-2 flex items-center justify-between transition-all ${index === 0
                           ? "bg-orange-50 border-orange-300 shadow-md"
                           : "bg-white border-gray-200"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-4">
                         <div
-                          className={`queue-badge ${
-                            index === 0 ? "bg-orange-500" : "bg-gray-500"
-                          }`}
+                          className={`queue-badge ${index === 0 ? "bg-orange-500" : "bg-gray-500"
+                            }`}
                         >
                           #{customer.position}
                         </div>
