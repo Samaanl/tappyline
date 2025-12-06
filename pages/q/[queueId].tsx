@@ -18,7 +18,7 @@ export default function CustomerQueue() {
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerMessage, setCustomerMessage] = useState("");
   const [queueSize, setQueueSize] = useState(0);
-  const [peopleAhead, setPeopleAhead] = useState(0);
+  const [peopleAhead, setPeopleAhead] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
   const unsubscribeRef = useRef<(() => void) | null>(null);
@@ -99,38 +99,68 @@ export default function CustomerQueue() {
     }
   };
 
+  const exitQueueState = () => {
+    setMyCustomer(null);
+    setPeopleAhead(null);
+    if (typeof queueId === "string") {
+      localStorage.removeItem(`customer_${queueId}`);
+    }
+  };
+
   const checkCustomerStatus = async () => {
     if (!myCustomer?.$id || typeof queueId !== "string") return;
 
     try {
-      const customers = await customerOperations.getQueueCustomers(queueId);
-      const index = customers.findIndex((c) => c.$id === myCustomer.$id);
-      const found = customers[index];
+      // 1. Fetch my specific document to check true status
+      const me = await customerOperations.getCustomer(myCustomer.$id);
 
-      if (found) {
-        setMyCustomer(found);
-        setPeopleAhead(index); // Index 0 means 0 people ahead
-        localStorage.setItem(`customer_${queueId}`, JSON.stringify(found));
+      if (!me) {
+        toast.error("You were removed from the queue");
+        exitQueueState();
+        return;
+      }
 
-        // Show notification if customer is next
-        if (found.status === "next") {
+      setMyCustomer(me);
+      localStorage.setItem(`customer_${queueId}`, JSON.stringify(me));
+
+      if (me.status === "left") {
+        toast.error("You were removed from the queue");
+        exitQueueState();
+        return;
+      }
+
+      if (me.status === "served") {
+        if (myCustomer.status !== "served") {
+          toast.success("It's your turn! Head to the counter! 🎊");
+        }
+        return;
+      }
+
+      if (me.status === "next") {
+        if (myCustomer.status !== "next") {
           toast("You're next! Get ready! 🎉", {
             icon: "👋",
             duration: 6000,
           });
         }
-
-        // Show notification if customer was served
-        if (found.status === "served") {
-          toast.success("It's your turn! Head to the counter! 🎊");
-        }
-      } else {
-        // Customer was removed
-        toast.error("You were removed from the queue");
-        handleLeaveQueue();
       }
+
+      // 2. Calculate people ahead
+      const customers = await customerOperations.getQueueCustomers(queueId);
+      const index = customers.findIndex((c) => c.$id === me.$id);
+
+      if (index !== -1) {
+        setPeopleAhead(index);
+      } else {
+        console.warn("Customer not found in queue list");
+      }
+
     } catch (error) {
       console.error("Error checking customer status:", error);
+      if ((error as any).code === 404) {
+        toast.error("You were removed from the queue");
+        exitQueueState();
+      }
     }
   };
 
@@ -176,23 +206,15 @@ export default function CustomerQueue() {
       return;
     }
 
-    if (!myCustomer?.$id) {
-      setMyCustomer(null);
-      if (typeof queueId === "string") {
-        localStorage.removeItem(`customer_${queueId}`);
-      }
+    if (!myCustomer?.$id || typeof queueId !== "string") {
+      exitQueueState();
       return;
     }
 
-    if (typeof queueId !== "string") return;
-
     try {
-      // Actually remove from queue in database
       await customerOperations.removeCustomer(myCustomer.$id, queueId);
-
-      setMyCustomer(null);
-      localStorage.removeItem(`customer_${queueId}`);
       toast.success("You've left the queue");
+      exitQueueState();
     } catch (error) {
       console.error("Error leaving queue:", error);
       toast.error("Failed to leave queue");
@@ -385,10 +407,14 @@ export default function CustomerQueue() {
                         You're in Line
                       </h2>
                       <p className="text-gray-600">
-                        {peopleAhead === 0
-                          ? "You're next in line!"
-                          : `${peopleAhead} ${peopleAhead === 1 ? "person" : "people"
-                          } ahead of you`}
+                        {peopleAhead === null ? (
+                          <span className="animate-pulse">Calculating position...</span>
+                        ) : peopleAhead === 0 ? (
+                          "You're next in line!"
+                        ) : (
+                          `${peopleAhead} ${peopleAhead === 1 ? "person" : "people"
+                          } ahead of you`
+                        )}
                       </p>
                     </>
                   )}
