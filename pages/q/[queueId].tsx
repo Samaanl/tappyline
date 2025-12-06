@@ -18,10 +18,31 @@ export default function CustomerQueue() {
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerMessage, setCustomerMessage] = useState("");
   const [queueSize, setQueueSize] = useState(0);
-  const [peopleAhead, setPeopleAhead] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [joining, setJoining] = useState(false);
-  const unsubscribeRef = useRef<(() => void) | null>(null);
+  const [timeLeft, setTimeLeft] = useState(60);
+
+  // ... existing useEffects ...
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (myCustomer?.status === "served") {
+      interval = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            exitQueueState();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [myCustomer?.status]);
+
+  // ... existing code ...
+
+
 
   useEffect(() => {
     if (!queueId || typeof queueId !== "string") return;
@@ -388,9 +409,12 @@ export default function CustomerQueue() {
                       <h2 className="text-3xl font-bold text-green-600 mb-2">
                         It's Your Turn!
                       </h2>
-                      <p className="text-gray-600">
-                        Please head to the counter now 🎉
+                      <p className="text-gray-600 mb-4">
+                        Please proceed! 🎉
                       </p>
+                      <div className="text-sm font-medium text-orange-600 bg-orange-50 py-2 px-4 rounded-full inline-block">
+                        Leaving queue in {timeLeft}s
+                      </div>
                     </>
                   ) : myCustomer.status === "next" ? (
                     <>
