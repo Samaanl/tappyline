@@ -23,6 +23,11 @@ export default function CustomerQueue() {
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
   const unsubscribeRef = useRef<(() => void) | null>(null);
+  const myCustomerRef = useRef<Customer | null>(null);
+
+  useEffect(() => {
+    myCustomerRef.current = myCustomer;
+  }, [myCustomer]);
 
   // ... existing useEffects ...
 
@@ -70,8 +75,8 @@ export default function CustomerQueue() {
         console.log("Realtime update:", payload);
         loadQueueSize();
 
-        // Reload my customer data
-        if (myCustomer?.$id) {
+        // Reload my customer data using ref
+        if (myCustomerRef.current?.$id) {
           checkCustomerStatus();
         }
       }
@@ -84,7 +89,7 @@ export default function CustomerQueue() {
         unsubscribeRef.current();
       }
     };
-  }, [queueId, myCustomer]);
+  }, [queueId]);
 
   const loadQueueData = async () => {
     if (typeof queueId !== "string") return;
@@ -472,7 +477,7 @@ export default function CustomerQueue() {
                   </div>
                 </div>
 
-                {myCustomer.status !== "served" && (
+                {["waiting", "next"].includes(myCustomer.status) && (
                   <button
                     onClick={handleLeaveQueue}
                     className="w-full px-6 py-3 bg-red-100 hover:bg-red-200 text-red-700 font-semibold rounded-xl transition-all duration-200"
