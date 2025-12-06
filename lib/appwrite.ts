@@ -158,6 +158,20 @@ export const customerOperations = {
     return response as unknown as Customer;
   },
 
+  // Get single customer by ID
+  async getCustomer(documentId: string): Promise<Customer | null> {
+    try {
+      const response = await databases.getDocument(
+        DATABASE_ID,
+        CUSTOMERS_COLLECTION_ID,
+        documentId
+      );
+      return response as unknown as Customer;
+    } catch (error) {
+      return null;
+    }
+  },
+
   // Get all customers in a queue
   async getQueueCustomers(queueId: string): Promise<Customer[]> {
     try {
