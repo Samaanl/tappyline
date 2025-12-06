@@ -156,7 +156,7 @@ export default function CustomerQueue() {
 
       if (me.status === "served") {
         if (myCustomer.status !== "served") {
-          toast.success("It's your turn! Head to the counter! 🎊");
+          toast.success("It's your turn! Please proceed! 🎊");
         }
         return;
       }
@@ -171,14 +171,15 @@ export default function CustomerQueue() {
       }
 
       // 2. Calculate people ahead
+      // robust calculation: count how many waiting customers have a smaller position number
       const customers = await customerOperations.getQueueCustomers(queueId);
-      const index = customers.findIndex((c) => c.$id === me.$id);
 
-      if (index !== -1) {
-        setPeopleAhead(index);
-      } else {
-        console.warn("Customer not found in queue list");
-      }
+      // Filter out myself just in case, and count those with smaller position
+      const aheadCount = customers.filter(c =>
+        c.$id !== me.$id && c.position < me.position
+      ).length;
+
+      setPeopleAhead(aheadCount);
 
     } catch (error) {
       console.error("Error checking customer status:", error);
@@ -471,12 +472,14 @@ export default function CustomerQueue() {
                   </div>
                 </div>
 
-                <button
-                  onClick={handleLeaveQueue}
-                  className="w-full px-6 py-3 bg-red-100 hover:bg-red-200 text-red-700 font-semibold rounded-xl transition-all duration-200"
-                >
-                  Leave Queue
-                </button>
+                {myCustomer.status !== "served" && (
+                  <button
+                    onClick={handleLeaveQueue}
+                    className="w-full px-6 py-3 bg-red-100 hover:bg-red-200 text-red-700 font-semibold rounded-xl transition-all duration-200"
+                  >
+                    Leave Queue
+                  </button>
+                )}
               </div>
 
               <div className="card bg-blue-50 border-2 border-blue-200">
