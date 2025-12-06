@@ -91,6 +91,12 @@ export default function CustomerQueue() {
     };
   }, [queueId]);
 
+  useEffect(() => {
+    if (myCustomer?.$id) {
+      checkCustomerStatus();
+    }
+  }, [myCustomer?.$id]);
+
   const loadQueueData = async () => {
     if (typeof queueId !== "string") return;
 
