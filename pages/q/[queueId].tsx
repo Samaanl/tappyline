@@ -34,17 +34,26 @@ export default function CustomerQueue() {
     myCustomerRef.current = myCustomer;
   }, [myCustomer]);
 
-  // Show ad after mount (check localStorage)
+  // Determine if customer is actively in queue (waiting or next)
+  const isInQueue = myCustomer && ["waiting", "next"].includes(myCustomer.status);
+
+  // Show ad after mount (check localStorage) — but always show when in queue
   useEffect(() => {
+    if (isInQueue) {
+      // Always show ad while waiting — non-dismissable
+      setAdDismissed(false);
+      return;
+    }
     const dismissed = localStorage.getItem(AD_DISMISS_KEY);
     if (!dismissed) {
       // small delay so it slides up nicely
       const timer = setTimeout(() => setAdDismissed(false), 1500);
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [isInQueue]);
 
   const handleDismissAd = () => {
+    if (isInQueue) return; // can't dismiss while waiting
     setAdDismissed(true);
     localStorage.setItem(AD_DISMISS_KEY, "1");
   };
@@ -534,16 +543,18 @@ export default function CustomerQueue() {
             boxShadow: '0 -4px 30px rgba(107, 33, 168, 0.4)',
           }}
         >
-          {/* Dismiss button */}
-          <button
-            onClick={handleDismissAd}
-            aria-label="Dismiss ad"
-            className="absolute -top-3 right-3 w-7 h-7 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-500 hover:text-gray-800 hover:scale-110 transition-all duration-200 border border-gray-200"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          {/* Dismiss button — hidden while waiting in queue */}
+          {!isInQueue && (
+            <button
+              onClick={handleDismissAd}
+              aria-label="Dismiss ad"
+              className="absolute -top-3 right-3 w-7 h-7 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-500 hover:text-gray-800 hover:scale-110 transition-all duration-200 border border-gray-200"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
 
           {/* Ad Content */}
           <a
