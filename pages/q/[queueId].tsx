@@ -8,6 +8,10 @@ import {
 } from "../../lib/appwrite";
 import toast from "react-hot-toast";
 
+// ── Gumroad Ad Configuration ──
+const GUMROAD_URL = "https://nasifasayed.gumroad.com/l/ccpjs";
+const AD_DISMISS_KEY = "ebook_ad_dismissed";
+
 export default function CustomerQueue() {
   const router = useRouter();
   const { queueId } = router.query;
@@ -22,12 +26,28 @@ export default function CustomerQueue() {
   const [peopleAhead, setPeopleAhead] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
+  const [adDismissed, setAdDismissed] = useState(true); // start hidden, reveal after mount
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const myCustomerRef = useRef<Customer | null>(null);
 
   useEffect(() => {
     myCustomerRef.current = myCustomer;
   }, [myCustomer]);
+
+  // Show ad after mount (check localStorage)
+  useEffect(() => {
+    const dismissed = localStorage.getItem(AD_DISMISS_KEY);
+    if (!dismissed) {
+      // small delay so it slides up nicely
+      const timer = setTimeout(() => setAdDismissed(false), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const handleDismissAd = () => {
+    setAdDismissed(true);
+    localStorage.setItem(AD_DISMISS_KEY, "1");
+  };
 
   // ... existing useEffects ...
 
@@ -288,7 +308,7 @@ export default function CustomerQueue() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className={`container mx-auto px-4 py-8 ${!adDismissed ? 'pb-36 sm:pb-28' : ''}`}>
         <div className="max-w-2xl mx-auto">
           {!myCustomer ? (
             /* Join Queue Form */
@@ -504,6 +524,63 @@ export default function CustomerQueue() {
           )}
         </div>
       </main>
+      {/* ── Floating Bottom Ad Banner ── */}
+      {!adDismissed && (
+        <div
+          id="ebook-ad-banner"
+          className="fixed bottom-0 left-0 right-0 z-50 animate-slide-up"
+          style={{
+            background: 'linear-gradient(135deg, #6B21A8 0%, #9333EA 30%, #F97316 100%)',
+            boxShadow: '0 -4px 30px rgba(107, 33, 168, 0.4)',
+          }}
+        >
+          {/* Dismiss button */}
+          <button
+            onClick={handleDismissAd}
+            aria-label="Dismiss ad"
+            className="absolute -top-3 right-3 w-7 h-7 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-500 hover:text-gray-800 hover:scale-110 transition-all duration-200 border border-gray-200"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          {/* Ad Content */}
+          <a
+            href={GUMROAD_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block px-4 py-3 sm:py-4"
+          >
+            <div className="max-w-lg mx-auto flex items-center gap-3 sm:gap-4">
+              {/* Book emoji icon */}
+              <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                <span className="text-2xl sm:text-3xl">📚</span>
+              </div>
+
+              {/* Text Content */}
+              <div className="flex-1 min-w-0">
+                <p className="text-white font-bold text-sm sm:text-base leading-tight">
+                  750+ Self-Improvement eBooks
+                </p>
+                <p className="text-white/80 text-xs sm:text-sm mt-0.5">
+                  Mindset · Confidence · Productivity · Goals
+                </p>
+              </div>
+
+              {/* CTA Button */}
+              <div className="flex-shrink-0">
+                <span className="inline-flex items-center gap-1 px-3 py-1.5 sm:px-4 sm:py-2 bg-amber-400 hover:bg-amber-300 text-gray-900 font-extrabold text-xs sm:text-sm rounded-full shadow-lg transition-all duration-200 whitespace-nowrap">
+                  $1.99
+                  <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </a>
+        </div>
+      )}
     </div>
   );
 }
