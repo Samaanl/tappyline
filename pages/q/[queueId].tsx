@@ -571,10 +571,11 @@ export default function CustomerQueue() {
 
               {/* Text Content */}
               <div className="flex-1 min-w-0">
-                <p className="text-white font-bold text-sm sm:text-base leading-tight">
-                  750+ Self-Improvement eBooks
+                <p className="text-white font-bold text-sm sm:text-base leading-tight flex items-center gap-2">
+                  <span className="truncate">750+ Self-Improvement eBooks</span>
+                  <span className="flex-shrink-0 text-[10px] font-black tracking-wider bg-white/20 text-white px-1.5 py-0.5 rounded uppercase">Ad</span>
                 </p>
-                <p className="text-white/80 text-xs sm:text-sm mt-0.5">
+                <p className="text-white/80 text-xs sm:text-sm mt-0.5 truncate">
                   Mindset · Confidence · Productivity · Goals
                 </p>
               </div>
